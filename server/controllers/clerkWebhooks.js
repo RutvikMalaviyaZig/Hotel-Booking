@@ -14,15 +14,16 @@ const clerkWebhooks = async (req, res) => {
         }
 
         // verify webhook
-        const payload = await webhook.verify(JSON.stringify(req.body), headers);
+        await webhook.verify(JSON.stringify(req.body), headers);
 
         // get data from body
-        const { data, type } = payload.body;
+        const { data, type } = req.body;
 
         // switch case for different events
         switch (type) {
             case "user.created": {
                 const userData = {
+                    _id: data.id,
                     username: data.first_name + " " + data.last_name,
                     email: data.email_addresses[0].email_address,
                     image: data.image_url,
@@ -36,16 +37,16 @@ const clerkWebhooks = async (req, res) => {
                     email: data.email_addresses[0].email_address,
                     image: data.image_url,
                 }
-                await User.findOneAndUpdate({ _id: data.id }, userData);
+                await User.findByIdAndUpdate(data.id, userData);
                 break;
             }
             case "user.deleted": {
-                await User.findOneAndDelete({ _id: data.id });
+                await User.findByIdAndDelete(data.id);
                 break;
             }
-            default: {
+            default:
                 break;
-            }
+
         }
         res.status(200).json({ message: "Webhook received" });
     } catch (error) {
