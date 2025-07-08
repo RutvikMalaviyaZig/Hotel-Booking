@@ -9,6 +9,7 @@ const hotelRoutes = require("./routes/hotelroutes");
 const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const connectCloudinary = require("./config/cloudinary");
+const { stripeWebhooks } = require("./controllers/stripeWebhooks");
 
 // connect to db
 connectDB();
@@ -21,6 +22,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware()); // Clerk middleware
+
+// Api to receive stripe webhooks
+app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 // Api to receive clerk webhooks
 app.post("/api/clerk", clerkWebhooks);

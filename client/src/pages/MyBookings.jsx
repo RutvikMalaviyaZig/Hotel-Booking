@@ -4,7 +4,7 @@ import { assets } from '../assets/assets'
 import { useAppContext } from '../context/AppContext'
 
 const MyBookings = () => {
-    const { getToken, axios, user, toast } = useAppContext();
+    const { getToken, axios, user, toast, navigate } = useAppContext();
     const [bookings, setBookings] = useState([])
 
     const fetchUserBookings = async () => {
@@ -23,6 +23,26 @@ const MyBookings = () => {
             toast.error(error.message)
         }
     }
+
+    const handlePayment = async (bookingId) => {
+        try {
+            const { data } = await axios.post(`/api/booking/stripe-payment`, {
+                bookingId,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${await getToken()}`,
+                },
+            });
+            if (data.success) {
+                window.location.href = data.url;
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
     useEffect(() => {
         if (user) {
             fetchUserBookings();
@@ -75,7 +95,7 @@ const MyBookings = () => {
                                 <div className={`w-3 h-3 rounded-full ${booking.isPaid ? "bg-green-500" : "bg-red-500"}`}></div>
                                 <p className={`text-sm ${booking.isPaid ? "text-green-500" : "text-red-500"}`}>{booking.isPaid ? "Paid" : "Pending"}</p>
                             </div>
-                            {!booking.isPaid && <button className='px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full cursor-pointer hover:bg-gray-50 transition-all'>Pay Now</button>}
+                            {!booking.isPaid && <button onClick={() => handlePayment(booking._id)} className='px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full cursor-pointer hover:bg-gray-50 transition-all'>Pay Now</button>}
                         </div>
                     </div>
                 ))}

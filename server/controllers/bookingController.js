@@ -3,6 +3,7 @@ const Booking = require("../models/Booking");
 const Hotel = require("../models/Hotel");
 const Room = require("../models/Room");
 const transporter = require("../config/nodemailer");
+const stripe = require("stripe")
 // check availability of room
 const checkAvailability = async ({ checkInDate, checkOutDate, room }) => {
     try {
@@ -109,10 +110,46 @@ const getHotelBookings = async (req, res) => {
     }
 }
 
+// create payment intent
+const stripePayment = async (req, res) => {
+    try {
+        const { bookingId } = req.body;
+        const bookingData = await Booking.findById(bookingId);
+        const roomData = await Room.findById(bookingData.room).populate("hotel");
+        const amount = bookingData.totalPrice;
+        const { origin } = req.headers;
+        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+        const line_items = [
+            {
+                price_data: {
+                    currency: "usd",
+                    product_data: {
+                        name: roomData.hotel.name,
+                    },
+                    unit_amount: amount * 100,
+                },
+                quantity: 1,
+            }
+        ]
+
+        const session = await stripeInstance.checkout.sessions.create({
+            line_items,
+            mode: "payment",
+            success_url: `${origin}/loader/my-bookings`,
+            cancel_url: `${origin}/my-bookings`,
+            metadata: { bookingId },
+        });
+        res.status(200).json({ success: true, url: session.url });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+}
+
 module.exports = {
     checkAvailability,
     checkAvailabilityApi,
     createBooking,
     getUserBookings,
-    getHotelBookings
+    getHotelBookings,
+    stripePayment
 }
