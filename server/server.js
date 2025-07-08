@@ -27,7 +27,7 @@ app.use(clerkMiddleware()); // Clerk middleware
 app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 // Api to receive clerk webhooks
-app.post("/api/clerk", clerkWebhooks);
+app.use("/api/clerk", clerkWebhooks);
 
 // Routes
 app.get("/", (req, res) => {
