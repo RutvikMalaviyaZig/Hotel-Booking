@@ -4,9 +4,15 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const { clerkMiddleware } = require("@clerk/express");
 const clerkWebhooks = require("./controllers/clerkWebhooks");
+const userRoutes = require("./routes/userRoutes");
+const hotelRoutes = require("./routes/hotelroutes");
+const roomRoutes = require("./routes/roomRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
+const connectCloudinary = require("./config/cloudinary");
 
 // connect to db
 connectDB();
+connectCloudinary();
 
 // Initialize app
 const app = express();
@@ -23,6 +29,18 @@ app.post("/api/clerk", clerkWebhooks);
 app.get("/", (req, res) => {
     res.send("Hello World!");
 });
+
+// User Routes
+app.use("/api/user", userRoutes);
+
+// Hotel Routes
+app.use("/api/hotel", hotelRoutes);
+
+// Room Routes
+app.use("/api/room", roomRoutes);
+
+// Booking Routes
+app.use("/api/booking", bookingRoutes);
 
 // Start server
 const PORT = process.env.PORT || 3000;

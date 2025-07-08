@@ -1,10 +1,33 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Title from '../components/Title'
-import { assets, userBookingsDummyData } from '../assets/assets'
+import { assets } from '../assets/assets'
+import { useAppContext } from '../context/AppContext'
 
 const MyBookings = () => {
+    const { getToken, axios, user, toast } = useAppContext();
+    const [bookings, setBookings] = useState([])
 
-    const [bookings, setBookings] = useState(userBookingsDummyData)
+    const fetchUserBookings = async () => {
+        try {
+            const { data } = await axios.get('/api/booking/user', {
+                headers: {
+                    Authorization: `Bearer ${await getToken()}`
+                }
+            })
+            if (data.success) {
+                setBookings(data.bookings)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    useEffect(() => {
+        if (user) {
+            fetchUserBookings();
+        }
+    }, [user])
     return (
         <div className='py-28 md:py-35 px-4 md:px-16 lg:px-24 xl:px-32' >
             <Title title="My Bookings" subtitle='Easily manage your past, current, and upcomming hotel reservations in one place. Plan your trrips seamlessly with just a few clicks' align='left' />

@@ -1,8 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import { cities } from "../assets/assets";
+import { useAppContext } from "../context/AppContext";
 
 const Hero = () => {
+  const { nevigate, getToken, axios, setSearchedCities } = useAppContext();
+  const [destination, setDestination] = useState("");
+
+
+  const onSearch = async (e) => {
+    e.preventDefault();
+    nevigate(`/rooms?destination=${destination}`)
+    await axios.post('/api/user/store-recent-search', { recentSearchCity: destination }, {
+      headers: {
+        Authorization: `Bearer ${await getToken()}`
+      }
+    })
+    setSearchedCities((prev) => {
+      const updatedCities = [...prev, destination];
+      if (updatedCities.length > 3) {
+        updatedCities.shift();
+      }
+      return updatedCities;
+    })
+  };
+
+
   return (
     <div className='flex flex-col items-start justify-center px-6 md:px-16 lg:px-24 xl:px-32 text-white bg-[url("/src/assets/heroImage.png")] bg-no-repeat bg-cover bg-center h-screen'>
       <p className="bg-[#49b9ff]/50 px-3.5 py-1 rounded-full mt-20">
@@ -12,16 +35,18 @@ const Hero = () => {
         Discover your Perfect Getaway Destination
       </h1>
       <p className="max-w-lg mt-2 text-sm md:text-base">
-      Unparalleled luxury and comfort await at the world's most exclusive hotels and resorts. Start your journey today.
+        Unparalleled luxury and comfort await at the world's most exclusive hotels and resorts. Start your journey today.
       </p>
       <div className="flex items-center gap-4 mt-4">
-        <form className="bg-stone-300 text-gray-500 rounded-lg px-6 py-4 mt-8 flex flex-col md:flex-row max-md:items-start gap-4 max-md:mx-auto">
+        <form onSubmit={onSearch} className="bg-stone-300 text-gray-500 rounded-lg px-6 py-4 mt-8 flex flex-col md:flex-row max-md:items-start gap-4 max-md:mx-auto">
           <div>
             <div className="flex items-center gap-2">
               <img src={assets.calenderIcon} alt="location" className="h-4" />
               <label htmlFor="destinationInput">Destination</label>
             </div>
             <input
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
               list="destinations"
               id="destinationInput"
               type="text"
@@ -38,7 +63,7 @@ const Hero = () => {
 
           <div>
             <div className="flex items-center gap-2">
-              <img src={assets.calenderIcon} alt="location" className="h-4"  />
+              <img src={assets.calenderIcon} alt="location" className="h-4" />
               <label htmlFor="checkIn">Check in</label>
             </div>
             <input

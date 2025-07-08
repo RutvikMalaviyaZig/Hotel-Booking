@@ -1,22 +1,79 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { roomCommonData, roomsDummyData } from '../assets/assets';
 import { assets } from '../assets/assets.js';
 import StarRating from './StarRating';
 import { facilityIcons } from '../assets/assets';
+import { useAppContext } from '../context/AppContext';
+import { roomCommonData } from '../assets/assets';
 
 const RoomDetails = () => {
     const { id } = useParams();
     const [room, setRoom] = useState(null);
     const [mainImage, setMainImage] = useState(null);
+    const { rooms, getToken, axios, navigate, toast } = useAppContext();
+    const [checkInDate, setCheckInDate] = useState('');
+    const [checkOutDate, setCheckOutDate] = useState('');
+    const [guests, setGuests] = useState(1);
+    const [isAvailable, setIsAvailable] = useState(false);
+
+    const checkAvailability = async () => {
+        try {
+            if (checkInDate >= checkOutDate) {
+                toast.error('Check-in date must be less than check-out date');
+                return;
+            }
+            const { data } = await axios.get(`/api/booking/check-availability`, {
+                room: id, checkInDate, checkOutDate
+            },);
+            if (data.success) {
+                setIsAvailable(true);
+                toast.success('Room is available');
+            } else {
+                setIsAvailable(false);
+                toast.error('Room is not available');
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+    const onSubmitHandler = async (e) => {
+        try {
+            e.preventDefault();
+            if (!isAvailable) {
+                return checkAvailability();
+            } else {
+                const { data } = await axios.post(`/api/booking/book`, {
+                    room: id, checkInDate, checkOutDate, guests, paymentMethod: 'Pay At Hotel',
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${await getToken()}`,
+                    },
+                });
+                if (data.success) {
+                    toast.success(data.message);
+                    navigate(`/my-bookings`);
+                    window.scrollTo(0, 0);
+                } else {
+                    toast.error(data.message);
+                }
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
 
     useEffect(() => {
-        const room = roomsDummyData.find((room) => room._id === id);
+        const room = rooms.find((room) => room._id === id);
         if (room) {
             setRoom(room);
             setMainImage(room.images[0]);
         }
-    }, []);
+    }, [rooms]);
+
+    useEffect(() => {
+        checkAvailability();
+    }, [checkInDate, checkOutDate, guests]);
 
     return room && (
         <div className='py-28 md:py-35 px-4 md:px-16 lg:px-24 xl:px-32'>
@@ -69,24 +126,26 @@ const RoomDetails = () => {
             </div>
 
             {/* CheckIn CheckOut Form */}
-            <form className='flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-6 rounded-xl shadow-[0px_0px_20px_rgba(0,0,0,0.15)] mt-16 mx-auto max-w-6xl'>
+            <form onSubmit={onSubmitHandler} className='flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-6 rounded-xl shadow-[0px_0px_20px_rgba(0,0,0,0.15)] mt-16 mx-auto max-w-6xl'>
                 <div className='flex flex-col gap-4 flex-wrap md:flex-row items-start md:items-center md:gap-10 text-gray-500'>
                     <div className='flex flex-col'>
                         <label htmlFor="checkInDate" className='font-medium'>Check-in</label>
-                        <input type="date" id="checkInDate" placeholder='Check-in' required className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none" />
+                        <input value={checkInDate} min={new Date().toISOString().split('T')[0]} onChange={(e) => setCheckInDate(e.target.value)} type="date" id="checkInDate" placeholder='Check-in' required className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none" />
                     </div>
                     <div className='w-px h-15 bg-gray-300/70 max-md:hidden'></div>
                     <div className='flex flex-col'>
                         <label htmlFor="checkOutDate" className='font-medium'>Check-out</label>
-                        <input type="date" id="checkOutDate" placeholder='Check-out' required className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none" />
+                        <input value={checkOutDate} min={checkInDate} disabled={!checkInDate} onChange={(e) => setCheckOutDate(e.target.value)} type="date" id="checkOutDate" placeholder='Check-out' required className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none" />
                     </div>
                     <div className='w-px h-15 bg-gray-300/70 max-md:hidden'></div>
                     <div className='flex flex-col'>
                         <label htmlFor="guests" className='font-medium'>Guests</label>
-                        <input type="number" id="guests" placeholder='1' required className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none" min={1} max={10} />
+                        <input value={guests} onChange={(e) => setGuests(e.target.value)} type="number" id="guests" placeholder='1' required className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none" min={1} max={10} />
                     </div>
                 </div>
-                <button type="submit" className='bg-primary hover:bg-primary-dull active:scale-95 transition-all rounded-md text-white cursor-pointer max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base'>Check Availability</button>
+                <button type="submit" className='bg-primary hover:bg-primary-dull active:scale-95 transition-all rounded-md text-white cursor-pointer max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base'>
+                    {isAvailable ? 'Book Now' : 'Check Availability'}
+                </button>
             </form>
 
             {/* Common Specifications */}
