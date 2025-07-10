@@ -17,20 +17,17 @@ export const AppProvider = ({ children }) => {
   const [isOwner, setIsOwner] = useState(false);
   const [showHotelReg, setShowHotelReg] = useState(false);
   const [searchedCities, setSearchedCities] = useState([]);
-  const [room, setRoom] = useState([]);
+  const [rooms, setRooms] = useState([]);
 
   const fetchRoom = async () => {
     try {
-      const { data } = await axios.get(
-        "https://hotel-booking-backend-two-weld.vercel.app/api/room",
-        {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-          },
-        }
-      );
+      const { data } = await axios.get('/api/rooms', {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
       if (data.success) {
-        setRoom(data.rooms);
+        setRooms(data.rooms);
       } else {
         toast.error(data.message);
       }
@@ -41,22 +38,19 @@ export const AppProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const { data } = await axios.get(
-        "https://hotel-booking-backend-two-weld.vercel.app/api/user",
-        {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-          },
-        }
-      );
+      const { data } = await axios.get('/api/user', {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
       if (data.success) {
-        setIsOwner(data.role === "owner");
+        setIsOwner(data.role === "hotelOwner");
         setSearchedCities(data.recentSearchedCities);
       } else {
         // retry fetchUser
         setTimeout(() => {
           fetchUser();
-        }, 5000);
+        }, 9000);
       }
     } catch (error) {
       toast.error(error.message);
@@ -85,8 +79,8 @@ export const AppProvider = ({ children }) => {
     axios,
     searchedCities,
     setSearchedCities,
-    room,
-    setRoom,
+    rooms,
+    setRooms,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

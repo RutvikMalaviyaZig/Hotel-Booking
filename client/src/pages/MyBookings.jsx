@@ -10,7 +10,7 @@ const MyBookings = () => {
   const fetchUserBookings = async () => {
     try {
       const { data } = await axios.get(
-        "https://hotel-booking-backend-two-weld.vercel.app/api/booking/user",
+        '/api/bookings/user',
         {
           headers: {
             Authorization: `Bearer ${await getToken()}`,
@@ -30,7 +30,7 @@ const MyBookings = () => {
   const handlePayment = async (bookingId) => {
     try {
       const { data } = await axios.post(
-        `https://hotel-booking-backend-two-weld.vercel.app/api/booking/stripe-payment`,
+        '/api/bookings/stripe-payment',
         {
           bookingId,
         },
@@ -119,14 +119,12 @@ const MyBookings = () => {
             <div className="flex flex-col items-start justify-center pt-3">
               <div className="flex items-center gap-2">
                 <div
-                  className={`w-3 h-3 rounded-full ${
-                    booking.isPaid ? "bg-green-500" : "bg-red-500"
-                  }`}
+                  className={`w-3 h-3 rounded-full ${booking.isPaid ? "bg-green-500" : "bg-red-500"
+                    }`}
                 ></div>
                 <p
-                  className={`text-sm ${
-                    booking.isPaid ? "text-green-500" : "text-red-500"
-                  }`}
+                  className={`text-sm ${booking.isPaid ? "text-green-500" : "text-red-500"
+                    }`}
                 >
                   {booking.isPaid ? "Paid" : "Pending"}
                 </p>

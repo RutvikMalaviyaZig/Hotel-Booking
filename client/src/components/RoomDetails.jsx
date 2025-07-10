@@ -22,8 +22,8 @@ const RoomDetails = () => {
         toast.error("Check-in date must be less than check-out date");
         return;
       }
-      const { data } = await axios.get(
-        `https://hotel-booking-backend-two-weld.vercel.app/api/booking/check-availability`,
+      const { data } = await axios.post(
+        `/api/bookings/check-availability`,
         {
           room: id,
           checkInDate,
@@ -31,8 +31,13 @@ const RoomDetails = () => {
         }
       );
       if (data.success) {
-        setIsAvailable(true);
-        toast.success("Room is available");
+        if (data.isAvailable) {
+          setIsAvailable(true);
+          toast.success("Room is available");
+        } else {
+          setIsAvailable(false);
+          toast.error("Room is not available");
+        }
       } else {
         setIsAvailable(false);
         toast.error("Room is not available");
@@ -49,7 +54,7 @@ const RoomDetails = () => {
         return checkAvailability();
       } else {
         const { data } = await axios.post(
-          `https://hotel-booking-backend-two-weld.vercel.app/api/booking/book`,
+          `/api/bookings/book`,
           {
             room: id,
             checkInDate,
@@ -127,9 +132,8 @@ const RoomDetails = () => {
               room?.images.map((image, index) => (
                 <img
                   onClick={() => setMainImage(image)}
-                  className={`w-full rounded-xl shadow-md object-cover cursor-pointer ${
-                    mainImage === image && "outline-3 outline-orange-500"
-                  }`}
+                  className={`w-full rounded-xl shadow-md object-cover cursor-pointer ${mainImage === image && "outline-3 outline-orange-500"
+                    }`}
                   key={index}
                   src={image}
                   alt="room-image"

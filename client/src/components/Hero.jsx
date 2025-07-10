@@ -4,14 +4,14 @@ import { cities } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 
 const Hero = () => {
-  const { nevigate, getToken, axios, setSearchedCities } = useAppContext();
+  const { navigate, getToken, axios, setSearchedCities } = useAppContext();
   const [destination, setDestination] = useState("");
 
   const onSearch = async (e) => {
     e.preventDefault();
-    nevigate(`/rooms?destination=${destination}`);
+    navigate(`/rooms?destination=${destination}`);
     await axios.post(
-      "https://hotel-booking-backend-two-weld.vercel.app/api/user/store-recent-search",
+      '/api/user/store-recent-search',
       { recentSearchCity: destination },
       {
         headers: {

@@ -4,13 +4,13 @@ import Title from './Title'
 import { useAppContext } from '../context/AppContext'
 
 const FeaturedDestination = () => {
-    const { room, navigate } = useAppContext();
-    return room.length > 0 && (
+    const { rooms, navigate } = useAppContext();
+    return rooms.length > 0 && (
         <div className='flex flex-col items-center px-6 md:px-16 lg:px-24 bg-slate-50 py-20'>
             <Title title="Featured Destination" subtitle="Explore the best hotels in the world" />
             <div className='flex flex-wrap gap-6 justify-center items-center mt-20'>
                 {
-                    room.slice(0, 4).map((room, index) => (
+                    rooms.slice(0, 4).map((room, index) => (
                         <HotelCard room={room} index={index} key={room._id} />
                     ))
                 }

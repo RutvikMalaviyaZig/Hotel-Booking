@@ -4,8 +4,15 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import { clerkMiddleware } from "@clerk/express";
 import clerkWebhooks from "./controllers/clerkWebhooks.js";
+import userRouter from "./routes/userRoutes.js";
+import hotelRoute from "./routes/hotelRoute.js";
+import connectCloudinary from "./config/cloudinary.js";
+import roomRoute from "./routes/roomRoute.js";
+import bookingRoute from "./routes/bookingRoutes.js";
+import { stripeWebhooks } from "./controllers/stripeWebhooks.js";
 
 connectDB();
+connectCloudinary();
 
 const app = express();
 
@@ -13,7 +20,14 @@ app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
 
+// Api to receive stripe webhooks
+app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
+
 app.use("/api/clerk", clerkWebhooks);
+app.use("/api/user", userRouter);
+app.use("/api/hotels", hotelRoute);
+app.use("/api/rooms", roomRoute);
+app.use("/api/bookings", bookingRoute);
 
 app.get("/", (req, res) => {
     res.send({ success: true, message: "Server is running" });

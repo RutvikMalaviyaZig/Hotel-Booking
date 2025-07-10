@@ -16,13 +16,13 @@ import { useAppContext } from "./context/AppContext";
 import Loader from "./components/Loader";
 
 const App = () => {
-  const isOvnerPath = useLocation().pathname.includes("owner");
+  const isOwnerPath = useLocation().pathname.includes("owner");
   const { showHotelReg } = useAppContext();
 
   return (
     <div>
       <Toaster />
-      {!isOvnerPath && <Navbar />}
+      {!isOwnerPath && <Navbar />}
       {showHotelReg && <HotelReg />}
       <div className="min-h-[70vh]">
         <Routes>

@@ -9,14 +9,11 @@ const ListRoom = () => {
 
   const fetchRooms = async () => {
     try {
-      const { data } = await axios.get(
-        `https://hotel-booking-backend-two-weld.vercel.app/api/room/owner`,
-        {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-          },
-        }
-      );
+      const { data } = await axios.get(`/api/rooms/owner`, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
       if (data.success) {
         setRooms(data.rooms);
       } else {
@@ -31,7 +28,7 @@ const ListRoom = () => {
   const toggleRoomAvailability = async (roomId) => {
     try {
       const { data } = await axios.post(
-        `https://hotel-booking-backend-two-weld.vercel.app/api/room/availability`,
+        `/api/rooms/toggle-availability`,
         {
           roomId,
         },

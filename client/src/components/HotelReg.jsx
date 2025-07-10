@@ -15,7 +15,7 @@ const HotelReg = () => {
     try {
       e.preventDefault();
       const { data } = await axios.post(
-        `https://hotel-booking-backend-two-weld.vercel.app/api/hotel`,
+        `/api/hotels/`,
         {
           name,
           contact,

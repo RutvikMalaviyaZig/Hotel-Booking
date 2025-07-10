@@ -51,16 +51,12 @@ const AddRoom = () => {
       Object.values(images).forEach((image) =>
         formData.append("images", image)
       );
-      const { data } = await axios.post(
-        `https://hotel-booking-backend-two-weld.vercel.app/api/room`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const { data } = await axios.post(`/api/rooms/`, formData, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
       if (data.success) {
         toast.success(data.message);
         setInputs({

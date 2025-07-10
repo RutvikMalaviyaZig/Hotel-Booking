@@ -56,11 +56,10 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 bg-transparent w-full flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 z-50 ${
-        isScrolled
+      className={`fixed top-0 left-0 bg-transparent w-full flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 z-50 ${isScrolled
           ? "bg-white/80 shadow-md text-gray-700 backdrop-blur-lg py-3 md:py-4"
           : "py-4 md:py-6"
-      }`}
+        }`}
     >
       {/* Logo */}
       <Link to="/">
@@ -77,15 +76,13 @@ const Navbar = () => {
           <a
             key={i}
             href={link.path}
-            className={`group flex flex-col gap-0.5 ${
-              isScrolled ? "text-gray-700" : "text-white"
-            }`}
+            className={`group flex flex-col gap-0.5 ${isScrolled ? "text-gray-700" : "text-white"
+              }`}
           >
             {link.name}
             <div
-              className={`${
-                isScrolled ? "bg-gray-700" : "bg-white"
-              } h-0.5 w-0 group-hover:w-full transition-all duration-300`}
+              className={`${isScrolled ? "bg-gray-700" : "bg-white"
+                } h-0.5 w-0 group-hover:w-full transition-all duration-300`}
             />
           </a>
         ))}
@@ -94,9 +91,8 @@ const Navbar = () => {
             onClick={() =>
               isOwner ? navigate("/owner") : setShowHotelReg(true)
             }
-            className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${
-              isScrolled ? "text-black" : "text-white"
-            } transition-all`}
+            className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${isScrolled ? "text-black" : "text-white"
+              } transition-all`}
           >
             {isOwner ? "Dashboard" : "List your Hotel"}
           </button>
@@ -107,16 +103,15 @@ const Navbar = () => {
       <div className="hidden md:flex items-center gap-4">
         <img
           src={assets.searchIcon}
-          className={`${
-            isScrolled && "invert"
-          } h-7 transition-all duration-500`}
+          className={`${isScrolled && "invert"
+            } h-7 transition-all duration-500`}
         ></img>
-        {/* {user && (<UserButton>
+        {user && (<UserButton>
           <UserButton.MenuItems>
             <UserButton.Action label="My Bookings" labelIcon={<BookIcon />} onClick={() => navigate("/my-bookings")} />
             <UserButton.Action label="Sign Out" onClick={() => navigate("/sign-out")} />
           </UserButton.MenuItems>
-        </UserButton>)} */}
+        </UserButton>)}
         {!user && (
           <button
             onClick={openSignIn}
@@ -130,12 +125,12 @@ const Navbar = () => {
       {/* Mobile Menu Button */}
 
       <div className="flex items-center gap-3 md:hidden cursor-pointer transition-all duration-500">
-        {/* {user && (<UserButton>
+        {user && (<UserButton>
           <UserButton.MenuItems>
             <UserButton.Action label="My Bookings" labelIcon={<BookIcon />} onClick={() => navigate("/my-bookings")} />
             <UserButton.Action label="Sign Out" onClick={() => navigate("/sign-out")} />
           </UserButton.MenuItems>
-        </UserButton>)} */}
+        </UserButton>)}
         <img
           onClick={() => setIsMenuOpen(true)}
           src={assets.menuIcon}
@@ -146,9 +141,8 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 left-0 w-full h-screen bg-white text-base flex flex-col md:hidden items-center justify-center gap-6 font-medium text-gray-800 transition-all duration-500 ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 w-full h-screen bg-white text-base flex flex-col md:hidden items-center justify-center gap-6 font-medium text-gray-800 transition-all duration-500 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <button
           className="absolute top-4 right-4 cursor-pointer"

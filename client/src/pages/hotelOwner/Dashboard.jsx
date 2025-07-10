@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Title from "../../components/Title";
 import { assets } from "../../assets/assets";
+import { useAppContext } from "../../context/AppContext";
 const Dashboard = () => {
   const { axios, getToken, user, toast, currency } = useAppContext();
   const [dashboardData, setDashboardData] = useState({
@@ -12,15 +13,19 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const { data } = await axios.get(
-        `https://hotel-booking-backend-two-weld.vercel.app/api/booking/hotel`,
+        `/api/bookings/hotel`,
         {
           headers: {
             Authorization: `Bearer ${await getToken()}`,
           },
         }
       );
-      if (data.success) {
-        setDashboardData(data.dashboardData);
+      if (data.success && data.dashboardData) {
+        setDashboardData({
+          bookings: data.dashboardData.bookings || [],
+          totalBookings: data.dashboardData.totalBookings || 0,
+          totalRevenue: data.dashboardData.totalRevenue || 0,
+        });
       } else {
         toast.error(data.message);
       }
@@ -104,11 +109,10 @@ const Dashboard = () => {
                 </td>
                 <td className="py-3 px-4 border-t border-gray-300 flex">
                   <button
-                    className={`py-3 px-3 text-xs rounded-full mx-auto ${
-                      item.isPaid
-                        ? "bg-green-200 text-green-600"
-                        : "bg-yellow-300 text-yellow-600"
-                    }`}
+                    className={`py-3 px-3 text-xs rounded-full mx-auto ${item.isPaid
+                      ? "bg-green-200 text-green-600"
+                      : "bg-yellow-300 text-yellow-600"
+                      }`}
                   >
                     {item.isPaid ? "Completed" : "Pending"}
                   </button>
