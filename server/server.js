@@ -16,30 +16,53 @@ connectCloudinary();
 
 const app = express();
 
-// Api to receive stripe webhooks
-app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
+// Stripe webhook needs the raw body, so we need to handle it before any other middleware
+app.post(
+    "/api/stripe",
+    // Raw body parser for Stripe webhook
+    express.raw({ type: 'application/json' }),
+    // Stripe webhook handler
+    stripeWebhooks
+);
 
+// Regular middleware for all other routes
 const allowedOrigins = [
     "http://localhost:5173",
     "https://hotel-booking-jade-chi.vercel.app",
 ];
 
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        } else {
-            return callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true,
+// Handle preflight requests
+app.options('*', cors({
+    origin: allowedOrigins,
+    credentials: true
 }));
 
-app.options('*', cors());
+// Then apply CORS to all other routes
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+}));
+
+// Regular body parser for all other routes
+app.use(express.json());
+
+// Parse JSON bodies (must come after the webhook route)
 app.use(express.json());
 app.use(clerkMiddleware());
 
+// Define API routes
 app.use("/api/clerk", clerkWebhooks);
 app.use("/api/user", userRouter);
 app.use("/api/hotels", hotelRoute);

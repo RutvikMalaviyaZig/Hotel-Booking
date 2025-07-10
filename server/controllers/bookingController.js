@@ -98,7 +98,7 @@ export const getHotelBookings = async (req, res) => {
         const bookings = await Booking.find({ hotel: hotel._id }).populate("room hotel user").sort({ createdAt: -1 });
         const totalBookings = bookings.length;
         const totalRevenue = bookings.reduce((acc, booking) => acc + booking.totalPrice, 0);
-        res.status(200).json({ success: true, bookings });
+        res.status(200).json({ success: true, bookings, totalBookings, totalRevenue });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

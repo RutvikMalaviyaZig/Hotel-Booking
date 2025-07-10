@@ -20,11 +20,12 @@ const Dashboard = () => {
           },
         }
       );
-      if (data.success && data.dashboardData) {
+      console.log(data);
+      if (data.success) {
         setDashboardData({
-          bookings: data.dashboardData.bookings || [],
-          totalBookings: data.dashboardData.totalBookings || 0,
-          totalRevenue: data.dashboardData.totalRevenue || 0,
+          bookings: data.bookings || [],
+          totalBookings: data.totalBookings || 0,
+          totalRevenue: data.totalRevenue || 0,
         });
       } else {
         toast.error(data.message);
