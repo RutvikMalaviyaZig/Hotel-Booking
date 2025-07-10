@@ -20,11 +20,23 @@ const app = express();
 app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 const allowedOrigins = [
-    "http://localhost:5173", // Dev
-    "https://hotel-booking-jade-chi.vercel.app", // Production frontend
+    "http://localhost:5173",
+    "https://hotel-booking-jade-chi.vercel.app",
 ];
 
-app.use(cors({ origin: allowedOrigins }));
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        } else {
+            return callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
+}));
+
+app.options('*', cors());
 app.use(express.json());
 app.use(clerkMiddleware());
 
