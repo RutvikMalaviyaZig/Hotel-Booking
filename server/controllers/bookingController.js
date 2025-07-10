@@ -2,6 +2,7 @@ import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 import transporter from "../config/nodemailer.js";
+import stripe from "stripe";
 
 const checkAvailability = async ({ room, checkInDate, checkOutDate }) => {
     try {
@@ -134,6 +135,7 @@ export const stripePayment = async (req, res) => {
         });
         res.status(200).json({ success: true, url: session.url });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }

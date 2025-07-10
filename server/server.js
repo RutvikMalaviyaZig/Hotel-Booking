@@ -16,12 +16,12 @@ connectCloudinary();
 
 const app = express();
 
+// Api to receive stripe webhooks
+app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
+
 app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
-
-// Api to receive stripe webhooks
-app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 app.use("/api/clerk", clerkWebhooks);
 app.use("/api/user", userRouter);
