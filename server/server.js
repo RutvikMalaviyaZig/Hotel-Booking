@@ -19,7 +19,12 @@ const app = express();
 // Api to receive stripe webhooks
 app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
-app.use(cors());
+const allowedOrigins = [
+    "http://localhost:5173", // Dev
+    "https://hotel-booking-jade-chi.vercel.app", // Production frontend
+];
+
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(clerkMiddleware());
 
