@@ -46,7 +46,24 @@ const bookingSchema = new mongoose.Schema({
         enum: ["pending", "confirmed", "cancelled"],
         default: "pending",
     },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
 }, { timestamps: true });
+
+// Middleware to automatically exclude deleted bookings
+bookingSchema.pre('find', function() {
+    this.where({ isDeleted: false });
+});
+
+bookingSchema.pre('findOne', function() {
+    this.where({ isDeleted: false });
+});
 
 const Booking = mongoose.model("Booking", bookingSchema);
 

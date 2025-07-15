@@ -1,11 +1,7 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-    _id: {
-        type: String,
-        default: mongoose.Types.ObjectId,
-    },
-    username: {
+const adminSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: true,
     },
@@ -13,26 +9,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image: {
-        type: String,
-    },
     role: {
         type: String,
-        enum: ["user", "hotelOwner"],
-        default: "user",
+        default: "admin",
     },
-    recentSearchedCities: {
-        type: [{ type: String }],
+    password: {
+        type: String,
+        required: true,
     },
     refreshToken: {
         type: String,
     },
     accessToken: {
         type: String,
-    },
-    password: {
-        type: String,
-        required: true,
     },
     isDeleted: {
         type: Boolean,
@@ -46,6 +35,6 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-const User = mongoose.model("User", userSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 
-export default User;
+export default Admin;

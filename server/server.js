@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import { clerkMiddleware } from "@clerk/express";
 import clerkWebhooks from "./controllers/clerkWebhooks.js";
 import userRouter from "./routes/userRoutes.js";
+import adminRouter from "./routes/adminRoutes.js";
 import hotelRoute from "./routes/hotelRoute.js";
 import connectCloudinary from "./config/cloudinary.js";
 import roomRoute from "./routes/roomRoute.js";
@@ -65,6 +66,7 @@ app.use(clerkMiddleware());
 // Define API routes
 app.use("/api/clerk", clerkWebhooks);
 app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/hotels", hotelRoute);
 app.use("/api/rooms", roomRoute);
 app.use("/api/bookings", bookingRoute);

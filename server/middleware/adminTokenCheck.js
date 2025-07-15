@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import Admin from "../models/Admin.js";
 import jwt from "jsonwebtoken";
 
 export const protect = async (req, res, next) => {
@@ -8,8 +8,8 @@ export const protect = async (req, res, next) => {
     if (!req.auth.userId) {
         return res.status(401).json({ success: false, message: "Unauthorized" })
     } else {
-        const user = await User.findById(req.auth.userId);
-        req.user = user;
+        const admin = await Admin.findById(req.auth.userId);
+        req.user = admin;
         next();
     }
 }

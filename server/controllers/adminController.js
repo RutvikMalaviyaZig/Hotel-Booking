@@ -1,41 +1,14 @@
-import User from "../models/User.js";
+import Admin from "../models/Admin.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-
-export const getUserData = async (req, res) => {
-    try {
-        const role = req.user.role;
-        const recentSearchedCities = req.user.recentSearchedCities;
-        res.json({ success: true, role, recentSearchedCities });
-    } catch (error) {
-        res.json({ success: false, message: error.message });
-    }
-}
-
-// recent search cities
-export const storeRecentSearchedCities = async (req, res) => {
-    try {
-        const { recentSearchCity } = req.body;
-        const user = await req.user;
-        if (user.recentSearchedCities.length < 3) {
-            user.recentSearchedCities.push(recentSearchCity);
-        } else {
-            user.recentSearchedCities.shift();
-            user.recentSearchedCities.push(recentSearchCity);
-        }
-        await user.save();
-        res.json({ success: true, message: "Recent searched cities stored successfully" });
-    } catch (error) {
-        res.json({ success: false, message: error.message });
-    }
-}
+import Booking from "../models/Booking.js";
 
 // sign up user
-export const signUpUser = async (req, res) => {
+export const signUpAdmin = async (req, res) => {
     try {
         const { name, email, password } = req.body;
-        const user = await User.findOne({ email });
+        const user = await Admin.findOne({ email });
         if (user) {
             return res.status(400).json({ success: false, message: "User already exists" });
         }
@@ -43,7 +16,7 @@ export const signUpUser = async (req, res) => {
         const userId = new mongoose.Types.ObjectId();
         const token = jwt.sign({ userId, email }, process.env.JWT_SECRET, { expiresIn: "1d" });
         const refreshToken = jwt.sign({ userId, email }, process.env.JWT_SECRET, { expiresIn: "7d" });
-        await User.create({ _id: userId, username: name, email, password: hashedPassword, role: "user", accessToken: token, refreshToken });
+        await Admin.create({ _id: userId, username: name, email, password: hashedPassword, role: "user", accessToken: token, refreshToken });
         res.json({ success: true, message: "User signed up successfully", token, refreshToken });
     } catch (error) {
         res.json({ success: false, message: error.message });
@@ -51,10 +24,10 @@ export const signUpUser = async (req, res) => {
 }
 
 // sign in user
-export const signInUser = async (req, res) => {
+export const signInAdmin = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        const user = await Admin.findOne({ email });
         if (!user) {
             return res.status(400).json({ success: false, message: "User not found" });
         }
@@ -80,7 +53,7 @@ export const refreshToken = async (req, res) => {
         if (!refreshToken) {
             return res.status(400).json({ success: false, message: "Refresh token is required" });
         }
-        const user = await User.findOne({ refreshToken });
+        const user = await Admin.findOne({ refreshToken });
         if (!user) {
             return res.status(400).json({ success: false, message: "User not found" });
         }
@@ -94,9 +67,9 @@ export const refreshToken = async (req, res) => {
 }
 
 // sign out user
-export const signOutUser = async (req, res) => {
+export const signOutAdmin = async (req, res) => {
     try {
-        const user = await User.findById(req.auth.userId);
+        const user = await Admin.findById(req.auth.userId);
         if (!user) {
             return res.status(400).json({ success: false, message: "User not found" });
         }
@@ -110,10 +83,10 @@ export const signOutUser = async (req, res) => {
 }
 
 // update user
-export const updateUser = async (req, res) => {
+export const updateAdmin = async (req, res) => {
     try {
         const { name, email } = req.body;
-        const user = await User.findById(req.auth.userId);
+        const user = await Admin.findById(req.auth.userId);
         if (!user) {
             return res.status(400).json({ success: false, message: "User not found" });
         }
@@ -125,4 +98,3 @@ export const updateUser = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 }
-
