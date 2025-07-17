@@ -5,64 +5,77 @@ import { validateBooking } from "../helpers/validation/BookingValidation.js";
 
 const checkAvailability = async ({ room, checkInDate, checkOutDate }) => {
   try {
+    // check if room is available
     const bookings = await Booking.find({
       room,
       checkInDate: { $lte: checkOutDate },
       checkOutDate: { $gte: checkInDate },
     });
+    // check if room is available
     const isAvailable = bookings.length === 0;
+    // return isAvailable
     return isAvailable;
   } catch (error) {
+    // return error
     return error;
   }
 };
 
 export const checkAvailabilityAPI = async (req, res) => {
   try {
+    // get data from request body
     const { room, checkInDate, checkOutDate } = req.body;
+    // validate data
     const validateBookingData = validateBooking({ eventCode: VALIDATION_EVENTS.CHECK_AVAILABILITY, room, checkInDate, checkOutDate });
     if (validateBookingData.hasError) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateBookingData.errors });
     }
+    // check availability
     const isAvailable = await checkAvailability({
       room,
       checkInDate,
       checkOutDate,
     });
+    // send response
     return res.status(HTTP_STATUS_CODE.OK).json({ success: true, isAvailable });
   } catch (error) {
+    // if anything goes wrong, return error
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
   }
 };
 
 export const createBooking = async (req, res) => {
+  // start session and transaction
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
+    // get data from request body
     const { room, checkInDate, checkOutDate, guests } = req.body;
+    // validate data
     const user = req.user;
     const validateBookingData = validateBooking({ eventCode: VALIDATION_EVENTS.CREATE_BOOKING, room, checkInDate, checkOutDate, guests });
     if (validateBookingData.hasError) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateBookingData.errors });
     }
-
+    // check availability
     const isAvailable = await checkAvailability({
       room,
       checkInDate,
       checkOutDate,
     });
-
+    // if room is not available, return error
     if (!isAvailable) {
       return res
         .status(HTTP_STATUS_CODE.BAD_REQUEST)
         .json({ success: false, message: req.__('Room.RoomNotAvailable') });
     }
+    // find room
     const roomData = await Room.findById(room).populate("hotel");
     let totalPrice = roomData.pricePerNight;
-
+    // calculate total price
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
-
+    // calculate time difference
     const timeDiff = checkOut.getTime() - checkIn.getTime();
     const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
@@ -79,11 +92,13 @@ export const createBooking = async (req, res) => {
       totalPrice,
       guests,
     });
+    // if booking is not created, return error
     if (!booking) {
       return res
         .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: req.__('Booking.CreateFailed') });
     }
+    // prepare mail options for user
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: req.user.email,
@@ -97,13 +112,16 @@ export const createBooking = async (req, res) => {
             Guests: ${guests}
             Thank you for using our service.`,
     };
+    // send mail to user
     await transporter.sendMail(mailOptions);
+    // send response
     res.status(HTTP_STATUS_CODE.CREATED).json({
       success: true,
       message: req.__('Booking.CreateSuccess'),
       booking,
     });
   } catch (error) {
+    // if anything goes wrong, abort the transaction and end the session and return error
     await session.abortTransaction();
     session.endSession();
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
@@ -112,22 +130,28 @@ export const createBooking = async (req, res) => {
 
 // update booking by admin or hotel owner
 export const updateBooking = async (req, res) => {
+  // start session and transaction
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
+    // get data from request body
     const { id } = req.params;
     const { checkInDate, checkOutDate, guests } = req.body;
     const user = req.user;
+    // validate data
     const validateBookingData = validateBooking({ eventCode: VALIDATION_EVENTS.UPDATE_BOOKING, id, checkInDate, checkOutDate, guests });
     if (validateBookingData.hasError) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateBookingData.errors });
     }
+    // find booking
     const booking = await Booking.findById(id);
+    // if booking is not found, return error
     if (!booking) {
       return res
         .status(HTTP_STATUS_CODE.NOT_FOUND)
         .json({ success: false, message: req.__('Booking.BookingNotFound') });
     }
+    // check if user is authorized to update booking
     if (user.role === USER_ROLES.ADMIN || user.role === USER_ROLES.HOTEL_OWNER) {
       await sendSQSMessage(EVENT_TYPES.BOOKING, {
         _id: id,
@@ -137,10 +161,15 @@ export const updateBooking = async (req, res) => {
     } else {
       return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ success: false, message: req.__('General.Unauthorized') });
     }
-    res
+    // commit transaction
+    await session.commitTransaction();
+    session.endSession();
+    // send response
+    return res
       .status(HTTP_STATUS_CODE.OK)
       .json({ success: true, message: req.__('Booking.UpdateSuccess') });
   } catch (error) {
+    // if anything goes wrong, abort the transaction and end the session and return error
     await session.abortTransaction();
     session.endSession();
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
@@ -149,28 +178,34 @@ export const updateBooking = async (req, res) => {
 
 // delete booking
 export const deleteBooking = async (req, res) => {
+  // start session and transaction
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
+    // get data from request body
     const { id } = req.params;
+    // validate data
     const validateBookingData = validateBooking({ eventCode: VALIDATION_EVENTS.DELETE_BOOKING, id });
     if (validateBookingData.hasError) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateBookingData.errors });
     }
+    // find booking
     const booking = await Booking.findById(id);
     if (!booking) {
       return res
         .status(HTTP_STATUS_CODE.NOT_FOUND)
         .json({ success: false, message: req.__('Booking.BookingNotFound') });
     }
+    // check if user is authorized to delete booking
     const user = req.user;
     if (user) {
+      // update booking
       await Booking.findByIdAndUpdate(id, {
         isDeleted: true,
         deletedAt: new Date(),
         status: BOOKING_STATUS.CANCELLED,
       });
-
+      // send booking data to SQS
       await sendSQSMessage(EVENT_TYPES.BOOKING, {
         _id: id,
         action: ACTIONS.DELETE,
@@ -179,8 +214,11 @@ export const deleteBooking = async (req, res) => {
     } else {
       return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ success: false, message: req.__('General.Unauthorized') });
     }
-
-    res.status(HTTP_STATUS_CODE.OK).json({
+    // commit transaction
+    await session.commitTransaction();
+    session.endSession();
+    // send response
+    return res.status(HTTP_STATUS_CODE.OK).json({
       success: true,
       message: req.__('Booking.BookingCancelled'),
     });
@@ -193,47 +231,60 @@ export const deleteBooking = async (req, res) => {
 
 export const getUserBookings = async (req, res) => {
   try {
+    // get user id from request
     const user = req.user._id;
+    // validate data
     const validateBookingData = validateBooking({ eventCode: VALIDATION_EVENTS.GET_USER_BOOKINGS, user });
     if (validateBookingData.hasError) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateBookingData.errors });
     }
+    // find bookings
     const bookings = await Booking.find({ user })
       .populate("room hotel")
       .sort({ createdAt: -1 });
-    res.status(HTTP_STATUS_CODE.OK).json({ success: true, bookings });
+    // send response
+    return res.status(HTTP_STATUS_CODE.OK).json({ success: true, bookings });
   } catch (error) {
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
   }
 };
 
 export const getHotelBookings = async (req, res) => {
+  // start session and transaction
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
+    // validate data
     const validateBookingData = validateBooking({ hotel: req.auth.userId, eventCode: VALIDATION_EVENTS.GET_HOTEL_BOOKINGS });
     if (validateBookingData.hasError) {
       return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateBookingData.errors });
     }
+    // find hotel
     const hotel = await Hotel.findOne({ owner: req.auth.userId });
     if (!hotel) {
       return res
         .status(HTTP_STATUS_CODE.NOT_FOUND)
         .json({ success: false, message: req.__('Hotel.HotelNotFound') });
     }
+    // find bookings
     const bookings = await Booking.find({ hotel: hotel._id })
       .populate("room hotel user")
       .sort({ createdAt: -1 });
+    // calculate total bookings and total revenue
     const totalBookings = bookings.length;
     const totalRevenue = bookings.reduce(
       (acc, booking) => acc + booking.totalPrice,
       0
     );
-    res
+    // send response
+    return res
       .status(HTTP_STATUS_CODE.OK)
       .json({ success: true, bookings, totalBookings, totalRevenue });
   } catch (error) {
-    res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
+    // if anything goes wrong, abort the transaction and end the session and return error
+    await session.abortTransaction();
+    session.endSession();
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
   }
 };
 

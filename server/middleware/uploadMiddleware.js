@@ -22,5 +22,5 @@ const upload = multer({
     }
 });
 
-export const uploadRoomImages = upload.array('images', 5); // 'images' is the field name, max 5 files
+export const uploadRoomImages = upload.array('images', 4); // 'images' is the field name, max 4 files
 export default upload;
