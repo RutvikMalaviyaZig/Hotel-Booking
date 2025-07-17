@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { mongoose } from "../config/constant.js";
 
 const bookingSchema = new mongoose.Schema({
     user: {
@@ -43,7 +43,7 @@ const bookingSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["pending", "confirmed", "cancelled"],
+        enum: ["pending", "completed", "cancelled"],
         default: "pending",
     },
     isDeleted: {
@@ -57,11 +57,11 @@ const bookingSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Middleware to automatically exclude deleted bookings
-bookingSchema.pre('find', function() {
+bookingSchema.pre('find', function () {
     this.where({ isDeleted: false });
 });
 
-bookingSchema.pre('findOne', function() {
+bookingSchema.pre('findOne', function () {
     this.where({ isDeleted: false });
 });
 

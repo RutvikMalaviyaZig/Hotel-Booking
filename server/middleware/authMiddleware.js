@@ -1,15 +1,31 @@
-import User from "../models/User.js";
-import jwt from "jsonwebtoken";
+import { User } from "../models/index.js";
+import { jwt } from "../config/constant.js";
 
 export const protect = async (req, res, next) => {
-    const token = req.headers.authorization.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.auth.userId = decoded.userId;
-    if (!req.auth.userId) {
-        return res.status(401).json({ success: false, message: "Unauthorized" })
-    } else {
-        const user = await User.findById(req.auth.userId);
-        req.user = user;
-        next();
+    try {
+        // get token from header
+        const token = req.headers.authorization.split(" ")[1];
+        // verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        // get user id from token
+        req.user = decoded.userId;
+        // check if user exists
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        } else {
+            // get user from database
+            const user = await User.findById(req.user);
+            // check if user exists
+            if (!user) {
+                return res.status(401).json({ success: false, message: "Unauthorized" })
+            }
+            // set user to req.user
+            req.user = user;
+            // call next middleware
+            next();
+        }
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
     }
 }

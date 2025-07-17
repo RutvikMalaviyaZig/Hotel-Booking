@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { mongoose } from "../config/constant.js";
 
 const userSchema = new mongoose.Schema({
     _id: {

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { mongoose } from "../config/constant.js";
 
 const hotelSchema = new mongoose.Schema({
     name: {

@@ -1,6 +1,7 @@
-import User from "../models/User.js";
-import { Webhook } from "svix";
+import { User } from "../models/index.js";
+import { Webhook } from "../config/constant.js";
 
+// this file is not in use
 const clerkWebhooks = async (req, res) => {
     try {
         const webhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);

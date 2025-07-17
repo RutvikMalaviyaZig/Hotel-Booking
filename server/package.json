@@ -20,13 +20,15 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.21.2",
+    "i18n": "^0.15.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.8.7",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^4.2.1",
     "nodemailer": "^6.9.1",
     "stripe": "^13.3.0",
-    "svix": "^1.11.0"
+    "svix": "^1.11.0",
+    "validatorjs": "^3.22.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

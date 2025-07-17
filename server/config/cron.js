@@ -1,6 +1,4 @@
-import cron from 'node-cron';
-
-import { receiveSQSMessage } from '../helpers/SQS/receiveData';
+import { SQS, cron } from "../config/constant.js";
 
 const cronFlag = process.env.ENABLE_CRON === 'true';
 
@@ -11,7 +9,7 @@ export const jobs = {
         start: cronFlag,
         onTick: async () => {
             try {
-                await receiveSQSMessage("booking");
+                await SQS.receiveSQSMessage("booking");
             } catch (error) {
                 console.error('Error in myFirstJob:', error);
             }

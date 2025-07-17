@@ -1,27 +1,28 @@
-import { sqs } from "../../config/constant.js";
-import { SendMessageCommand } from "@aws-sdk/client-sqs";
+import { SQS, EVENT_TYPES, MESSAGES } from "../../config/constant.js";
 
 export const sendSQSMessage = async (type, data) => {
+  try {
     let queueUrl;
     switch (type) {
-        case "booking":
-            queueUrl = process.env.BOOKING_QUEUE_URL;
-            break;
-        default:
-            throw new Error("Invalid type");
+      case EVENT_TYPES.BOOKING:
+        queueUrl = process.env.BOOKING_QUEUE_URL;
+        break;
+      default:
+        throw new Error(MESSAGES.INVALID_TYPE);
     }
 
     const params = {
-        MessageBody: JSON.stringify({ type, data }),
-        QueueUrl: queueUrl,
-    }
-    const command = new SendMessageCommand(params);
-    try {
-        const data = await sqs.send(command);
-        console.log("Message sent successfully", data);
-        return true;
-    } catch (error) {
-        console.log("Error sending message", error);
-        return false;
-    }
-}
+      MessageBody: JSON.stringify({ type, data }),
+      QueueUrl: queueUrl,
+    };
+    SQS.sendMessage(params, (err, data) => {
+      if (err) {
+        return { isError: true, data: err?.message || err };
+      } else {
+        return { isError: false, data };
+      }
+    });
+  } catch (error) {
+    return { isError: true, data: error?.message || error };
+  }
+};

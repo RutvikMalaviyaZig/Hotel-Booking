@@ -1,34 +1,41 @@
-import Booking from "../../models/Booking.js";
+import { Booking } from "../../models/index.js";
+import { ACTIONS, MESSAGES, mongoose } from "../../config/constant.js";
 
 export const processBooking = async (data) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         // Extract common fields
         const { _id, user, room, hotel, checkInDate, checkOutDate, totalPrice, guests, action } = data;
 
-        if (action === 'delete') {
+        if (action === ACTIONS.DELETE) {
             // Delete booking
             if (!_id) {
-                throw new Error('Booking ID is required for deletion');
+                return { isError: true, data: MESSAGES.INVALID_ID };
             }
-            const deleted = await Booking.findByIdAndDelete(_id);
+            const deleted = await Booking.findByIdAndDelete(_id, { session });
             if (!deleted) {
-                throw new Error('Booking not found');
+                return { isError: true, data: MESSAGES.NOT_FOUND };
             }
-            return deleted;
+            await session.commitTransaction();
+            session.endSession();
+            return { isError: false, data: deleted };
         }
 
         // Handle create/update operations
-        if (_id && action === 'update') {
+        if (_id && action === ACTIONS.UPDATE) {
             // Update existing booking
             const booking = await Booking.findByIdAndUpdate(
                 _id,
                 { checkInDate, checkOutDate, guests },
                 { new: true }
             );
-            return booking;
-        } else if (action === 'create') {
+            await session.commitTransaction();
+            session.endSession();
+            return { isError: false, data: booking };
+        } else if (action === ACTIONS.CREATE) {
             // Create new booking
-            const booking = await Booking.create({
+            const booking = await Booking.create([{
                 user,
                 room,
                 hotel,
@@ -36,11 +43,14 @@ export const processBooking = async (data) => {
                 checkOutDate,
                 totalPrice,
                 guests
-            });
-            return booking;
+            }], { session });
+            await session.commitTransaction();
+            session.endSession();
+            return { isError: false, data: booking };
         }
     } catch (error) {
-        console.error("Error processing booking:", error);
-        throw error;
+        await session.abortTransaction();
+        session.endSession();
+        return { isError: true, data: error };
     }
 }
