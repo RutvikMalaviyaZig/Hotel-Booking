@@ -1,5 +1,5 @@
 import { Admin } from "../models/index.js";
-import { jwt } from "../config/constant.js";
+import { jwt, HTTP_STATUS_CODE } from "../config/constant.js";
 
 export const protect = async (req, res, next) => {
     try {
@@ -11,13 +11,13 @@ export const protect = async (req, res, next) => {
         req.auth.userId = decoded.userId;
         // check if user exists
         if (!req.auth.userId) {
-            return res.status(401).json({ success: false, message: "Unauthorized" })
+            return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ success: false, message: "Unauthorized" })
         } else {
             // get user from database
             const admin = await Admin.findById(req.auth.userId);
             // check if user exists
             if (!admin) {
-                return res.status(401).json({ success: false, message: "Unauthorized" })
+                return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ success: false, message: "Unauthorized" })
             }
             // set user to req.user
             req.user = admin;
@@ -25,7 +25,6 @@ export const protect = async (req, res, next) => {
             next();
         }
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
+        res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 }

@@ -29,7 +29,11 @@
         "UserNotFound": "User not found",
         "InvalidPassword": "Invalid password",
         "UserAlreadyExists": "User already exists",
-        "RecentSearchedCitiesStoredSuccessfully": "Recent searched cities stored successfully"
+        "RecentSearchedCitiesStoredSuccessfully": "Recent searched cities stored successfully",
+        "SignInSuccess": "User signed in successfully",
+        "SignUpSuccess": "User signed up successfully",
+        "SignOutSuccess": "User signed out successfully",
+        "Unauthorized": "Unauthorized"
     },
     "Hotel": {
         "CreateSuccess": "Hotel created successfully",
@@ -75,7 +79,8 @@
     },
     "General": {
         "RefreshTokenRequired": "Refresh token is required",
-        "Unauthorized": "Unauthorized"
+        "Unauthorized": "Unauthorized",
+        "InternalServerError": "Internal server error"
     },
     "Stripe": {
         "WebhookSignatureVerificationFailed": "Webhook signature verification failed",

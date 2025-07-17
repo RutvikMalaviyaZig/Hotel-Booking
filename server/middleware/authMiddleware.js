@@ -1,5 +1,5 @@
 import { User } from "../models/index.js";
-import { jwt } from "../config/constant.js";
+import { jwt, HTTP_STATUS_CODE } from "../config/constant.js";
 
 export const protect = async (req, res, next) => {
     try {
@@ -11,13 +11,13 @@ export const protect = async (req, res, next) => {
         req.user = decoded.userId;
         // check if user exists
         if (!req.user) {
-            return res.status(401).json({ success: false, message: "Unauthorized" })
+            return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ success: false, message: req.__('General.Unauthorized') })
         } else {
             // get user from database
             const user = await User.findById(req.user);
             // check if user exists
             if (!user) {
-                return res.status(401).json({ success: false, message: "Unauthorized" })
+                return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({ success: false, message: req.__('General.Unauthorized') })
             }
             // set user to req.user
             req.user = user;
@@ -25,7 +25,6 @@ export const protect = async (req, res, next) => {
             next();
         }
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
+        res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: req.__('General.InternalServerError') });
     }
 }
