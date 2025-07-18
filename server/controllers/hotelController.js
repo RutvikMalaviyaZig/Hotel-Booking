@@ -1,4 +1,4 @@
-import { Hotel, User } from "../models/index.js";
+import { Hotel, Room, User, Booking } from "../models/index.js";
 import { USER_ROLES, HTTP_STATUS_CODE, VALIDATION_EVENTS, mongoose } from "../config/constant.js";
 import { validateHotel } from "../helpers/validation/HotelValidation.js";
 
@@ -104,6 +104,15 @@ export const deleteHotel = async (req, res) => {
         }
         // delete hotel
         await Hotel.findByIdAndDelete(hotel._id).session(session);
+        // delete rooms
+        await Room.deleteMany({ hotel: hotel._id }).session(session);
+        // delete bookings
+        await Booking.deleteMany({ hotel: hotel._id }).session(session);
+        // update user role if no hotel exists for the owner
+        const hotelCount = await Hotel.countDocuments({ owner }).session(session);
+        if (hotelCount === 0) {
+            await User.findByIdAndUpdate(owner, { role: USER_ROLES.USER }).session(session);
+        }
         // commit transaction
         await session.commitTransaction();
         session.endSession();
