@@ -2,6 +2,14 @@ import { User } from "../models/index.js";
 import { mongoose, jwt, bcrypt, USER_ROLES, TOKEN_EXPIRY, HTTP_STATUS_CODE, VALIDATION_EVENTS } from "../config/constant.js";
 import { validateUser } from "../helpers/validation/UserValidation.js";
 
+/**
+* @name getUserData
+* @file userController.js
+* @param {Request} req
+* @param {Response} res
+* @description get user data
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getUserData = async (req, res) => {
     try {
         // get user data from req.user
@@ -15,7 +23,14 @@ export const getUserData = async (req, res) => {
     }
 }
 
-// recent search cities
+/**
+* @name storeRecentSearchedCities
+* @file userController.js
+* @param {Request} req
+* @param {Response} res
+* @description store recent searched cities
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const storeRecentSearchedCities = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -52,7 +67,14 @@ export const storeRecentSearchedCities = async (req, res) => {
     }
 }
 
-// sign up user
+/**
+* @name signUpUser
+* @file userController.js
+* @param {Request} req
+* @param {Response} res
+* @description sign up user
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const signUpUser = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -119,7 +141,14 @@ export const signUpUser = async (req, res) => {
     }
 }
 
-// sign in user
+/**
+* @name signInUser
+* @file userController.js
+* @param {Request} req
+* @param {Response} res
+* @description sign in user
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const signInUser = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -149,6 +178,8 @@ export const signInUser = async (req, res) => {
         // update user access token and refresh token
         user.accessToken = token;
         user.refreshToken = refreshToken;
+        // update user login with
+        user.loginWith = "email";
         // save user
         await user.save({ session });
         // commit the transaction
@@ -164,7 +195,14 @@ export const signInUser = async (req, res) => {
     }
 }
 
-// refresh token
+/**
+* @name refreshToken
+* @file userController.js
+* @param {Request} req
+* @param {Response} res
+* @description refresh token
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const refreshToken = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -211,7 +249,14 @@ export const refreshToken = async (req, res) => {
     }
 }
 
-// sign out user
+/**
+* @name signOutUser
+* @file userController.js
+* @param {Request} req
+* @param {Response} res
+* @description sign out user
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const signOutUser = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -250,7 +295,14 @@ export const signOutUser = async (req, res) => {
     }
 }
 
-// update user
+/**
+* @name updateUser
+* @file userController.js
+* @param {Request} req
+* @param {Response} res
+* @description update user
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const updateUser = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -259,11 +311,11 @@ export const updateUser = async (req, res) => {
         const { name, email, password } = req.body;
         const eventCode = VALIDATION_EVENTS.UPDATE_USER;
         // validate user
-        const validateUser = validateUser({ name, email, password, eventCode });
-        if (validateUser.hasError) {
+        const validateUserData = validateUser({ name, email, password, eventCode });
+        if (validateUserData.hasError) {
             await session.abortTransaction();
             session.endSession();
-            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateUser.errors });
+            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateUserData.errors });
         }
         // get user from req.user
         const user = await User.findById(req.user._id);
@@ -290,3 +342,65 @@ export const updateUser = async (req, res) => {
     }
 }
 
+/**
+* @name googleSignIn
+* @file userController.js
+* @param {Request} req
+* @param {Response} res
+* @description google sign in
+* @author Rutvik Malaviya (Zignuts)
+*/
+export const googleSignIn = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        // get user data from req.body
+        const { name, email, socialMediaId } = req.body;
+        const eventCode = VALIDATION_EVENTS.GOOGLE_SIGN_IN;
+        // validate user
+        const validateUserData = validateUser({ name, email, socialMediaId, eventCode });
+        if (validateUserData.hasError) {
+            return res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({ success: false, message: validateUserData.errors });
+        }
+        // check if user exists with email and socialMediaId
+        const userData = await User.findOne({ email, socialMediaId });
+        // if user not found then create user
+        if (!userData) {
+            // create user
+            const _id = new mongoose.Types.ObjectId();
+            const user = new User({ _id, username: name, email, socialMediaId, loginWith: "google" });
+            // generate token and refresh token
+            const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: TOKEN_EXPIRY.USER_ACCESS_TOKEN })
+            const refreshToken = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: TOKEN_EXPIRY.USER_REFRESH_TOKEN })
+            user.accessToken = token;
+            user.refreshToken = refreshToken;
+            // save user
+            await user.save({ session });
+            // commit the transaction
+            await session.commitTransaction();
+            session.endSession();
+            // send response
+            return res.status(HTTP_STATUS_CODE.OK).json({ success: true, message: req.__('User.SignInSuccess'), token });
+        }
+        // update user
+        userData.username = name;
+        userData.socialMediaId = socialMediaId;
+        // generate token and refresh token
+        const token = jwt.sign({ userId: userData._id, email: userData.email }, process.env.JWT_SECRET, { expiresIn: TOKEN_EXPIRY.USER_ACCESS_TOKEN })
+        const refreshToken = jwt.sign({ userId: userData._id, email: userData.email }, process.env.JWT_SECRET, { expiresIn: TOKEN_EXPIRY.USER_REFRESH_TOKEN })
+        userData.accessToken = token;
+        userData.refreshToken = refreshToken;
+        // save user
+        await userData.save({ session });
+        // commit the transaction
+        await session.commitTransaction();
+        session.endSession();
+        // send response
+        return res.status(HTTP_STATUS_CODE.OK).json({ success: true, message: req.__('User.SignInSuccess'), token });
+    } catch (error) {
+        // if anything goes wrong, abort the transaction
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
+    }
+}

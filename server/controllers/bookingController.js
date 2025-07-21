@@ -3,6 +3,13 @@ import { HTTP_STATUS_CODE, EVENT_TYPES, ACTIONS, transporter, mongoose } from ".
 import { sendSQSMessage } from "../helpers/SQS/sendData.js";
 import { validateBooking } from "../helpers/validation/BookingValidation.js";
 
+/**
+* @name checkAvailability
+* @file bookingController.js
+* @param {Object} { room, checkInDate, checkOutDate }
+* @description check availability
+* @author Rutvik Malaviya (Zignuts)
+*/
 const checkAvailability = async ({ room, checkInDate, checkOutDate }) => {
   try {
     // check if room is available
@@ -21,6 +28,14 @@ const checkAvailability = async ({ room, checkInDate, checkOutDate }) => {
   }
 };
 
+/**
+* @name checkAvailabilityAPI
+* @file bookingController.js
+* @param {Request} req
+* @param {Response} res
+* @description check availability API
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const checkAvailabilityAPI = async (req, res) => {
   try {
     // get data from request body
@@ -44,6 +59,14 @@ export const checkAvailabilityAPI = async (req, res) => {
   }
 };
 
+/**
+* @name createBooking
+* @file bookingController.js
+* @param {Request} req
+* @param {Response} res
+* @description create booking
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const createBooking = async (req, res) => {
   // start session and transaction
   const session = await mongoose.startSession();
@@ -128,7 +151,14 @@ export const createBooking = async (req, res) => {
   }
 };
 
-// update booking by admin or hotel owner
+/**
+* @name updateBooking
+* @file bookingController.js
+* @param {Request} req
+* @param {Response} res
+* @description update booking
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const updateBooking = async (req, res) => {
   // start session and transaction
   const session = await mongoose.startSession();
@@ -176,7 +206,14 @@ export const updateBooking = async (req, res) => {
   }
 };
 
-// delete booking
+/**
+* @name deleteBooking
+* @file bookingController.js
+* @param {Request} req
+* @param {Response} res
+* @description delete booking
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const deleteBooking = async (req, res) => {
   // start session and transaction
   const session = await mongoose.startSession();
@@ -229,6 +266,14 @@ export const deleteBooking = async (req, res) => {
   }
 };
 
+/**
+* @name getUserBookings
+* @file bookingController.js
+* @param {Request} req
+* @param {Response} res
+* @description get user bookings
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getUserBookings = async (req, res) => {
   try {
     // get user id from request
@@ -249,6 +294,14 @@ export const getUserBookings = async (req, res) => {
   }
 };
 
+/**
+* @name getHotelBookings
+* @file bookingController.js
+* @param {Request} req
+* @param {Response} res
+* @description get hotel bookings
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getHotelBookings = async (req, res) => {
   // start session and transaction
   const session = await mongoose.startSession();
@@ -288,6 +341,14 @@ export const getHotelBookings = async (req, res) => {
   }
 };
 
+/**
+* @name stripePayment
+* @file bookingController.js
+* @param {Request} req
+* @param {Response} res
+* @description stripe payment
+* @author Rutvik Malaviya (Zignuts)
+*/
 // not in use
 // create payment intent
 // export const stripePayment = async (req, res) => {

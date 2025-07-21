@@ -2,6 +2,14 @@ import { Hotel, Room } from "../models/index.js";
 import { cloudinary, HTTP_STATUS_CODE, VALIDATION_EVENTS, mongoose } from "../config/constant.js";
 import { validateRoom } from "../helpers/validation/RoomValidation.js";
 
+/**
+* @name createRoom
+* @file roomController.js
+* @param {Request} req
+* @param {Response} res
+* @description create room
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const createRoom = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();
@@ -42,6 +50,14 @@ export const createRoom = async (req, res) => {
     }
 }
 
+/**
+* @name getRooms
+* @file roomController.js
+* @param {Request} req
+* @param {Response} res
+* @description get rooms
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getRooms = async (req, res) => {
     try {
         // get rooms
@@ -60,6 +76,14 @@ export const getRooms = async (req, res) => {
     }
 }
 
+/**
+* @name getOwnerRooms
+* @file roomController.js
+* @param {Request} req
+* @param {Response} res
+* @description get owner rooms
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getOwnerRooms = async (req, res) => {
     try {
         // validate data
@@ -79,6 +103,14 @@ export const getOwnerRooms = async (req, res) => {
     }
 }
 
+/**
+* @name toggleRoomAvailability
+* @file roomController.js
+* @param {Request} req
+* @param {Response} res
+* @description toggle room availability
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const toggleRoomAvailability = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();

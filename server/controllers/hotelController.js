@@ -2,6 +2,14 @@ import { Hotel, Room, User, Booking } from "../models/index.js";
 import { USER_ROLES, HTTP_STATUS_CODE, VALIDATION_EVENTS, mongoose } from "../config/constant.js";
 import { validateHotel } from "../helpers/validation/HotelValidation.js";
 
+/**
+* @name registerHotel
+* @file hotelController.js
+* @param {Request} req
+* @param {Response} res
+* @description register hotel
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const registerHotel = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();
@@ -43,6 +51,14 @@ export const registerHotel = async (req, res) => {
     }
 }
 
+/**
+* @name updateHotel
+* @file hotelController.js
+* @param {Request} req
+* @param {Response} res
+* @description update hotel
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const updateHotel = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();
@@ -80,6 +96,14 @@ export const updateHotel = async (req, res) => {
     }
 }
 
+/**
+* @name deleteHotel
+* @file hotelController.js
+* @param {Request} req
+* @param {Response} res
+* @description delete hotel
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const deleteHotel = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();

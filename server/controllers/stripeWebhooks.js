@@ -1,6 +1,14 @@
 import { stripe, HTTP_STATUS_CODE, BOOKING_STATUS, PAYMENT_STATUS, PAYMENT_METHOD, PAYMENT_EVENTS, mongoose } from "../config/constant.js";
 import { Booking } from "../models/index.js";
 
+/**
+* @name stripeWebhooks
+* @file stripeWebhooks.js
+* @param {Request} req
+* @param {Response} res
+* @description stripe webhooks
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const stripeWebhooks = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();

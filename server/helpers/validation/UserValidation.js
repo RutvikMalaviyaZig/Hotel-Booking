@@ -48,8 +48,14 @@ const validateUser = (bodyData) => {
             };
             break;
         }
-
-
+        case VALIDATION_EVENTS.GOOGLE_SIGN_IN: {
+            rules = {
+                name: 'string|required',
+                email: 'string|required|email',
+                socialMediaId: 'string|required',
+            };
+            break;
+        }
     }
 
     let validation = new validator(bodyData, rules);

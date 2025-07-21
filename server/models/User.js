@@ -32,7 +32,6 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
     },
     isDeleted: {
         type: Boolean,
@@ -41,6 +40,14 @@ const userSchema = new mongoose.Schema({
     deletedAt: {
         type: Date,
         default: null,
+    },
+    socialMediaId: {
+        type: String,
+    },
+    loginWith: {
+        type: String,
+        enum: ["email", "google", "facebook"],
+        default: "email",
     },
 }, {
     timestamps: true,

@@ -4,7 +4,14 @@ import { validateAdmin } from "../helpers/validation/AdminValidation.js";
 import { validateHotel } from "../helpers/validation/HotelValidation.js";
 import { validateUser } from "../helpers/validation/UserValidation.js";
 
-// sign up admin
+/**
+   * @name signUpAdmin
+   * @file adminController.js
+   * @param {Request} req
+   * @param {Response} res
+   * @description sign up admin
+   * @author Rutvik Malaviya (Zignuts)
+   */
 export const signUpAdmin = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -47,7 +54,14 @@ export const signUpAdmin = async (req, res) => {
     }
 }
 
-// sign in admin
+/**
+   * @name signInAdmin
+   * @file adminController.js
+   * @param {Request} req
+   * @param {Response} res
+   * @description sign in admin
+   * @author Rutvik Malaviya (Zignuts)
+   */
 export const signInAdmin = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();
@@ -93,7 +107,14 @@ export const signInAdmin = async (req, res) => {
     }
 }
 
-// refresh token
+/**
+* @name refreshToken
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description refresh token
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const refreshToken = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();
@@ -139,7 +160,14 @@ export const refreshToken = async (req, res) => {
     }
 }
 
-// sign out admin
+/**
+* @name signOutAdmin
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description sign out admin
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const signOutAdmin = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();
@@ -179,7 +207,14 @@ export const signOutAdmin = async (req, res) => {
     }
 }
 
-// update admin
+/**
+* @name updateAdmin
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description update admin
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const updateAdmin = async (req, res) => {
     // start session and transaction
     const session = await mongoose.startSession();
@@ -219,7 +254,14 @@ export const updateAdmin = async (req, res) => {
     }
 }
 
-// get all users
+/**
+* @name getAllUsers
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description get all users
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getAllUsers = async (req, res) => {
     try {
         // find all users
@@ -232,7 +274,14 @@ export const getAllUsers = async (req, res) => {
     }
 }
 
-// get all admins
+/**
+* @name getAllHotelOwners
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description get all hotel owners
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getAllHotelOwners = async (req, res) => {
     try {
         // find all hotel owners
@@ -245,7 +294,14 @@ export const getAllHotelOwners = async (req, res) => {
     }
 }
 
-// get all hotels
+/**
+* @name getAllHotels
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description get all hotels
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getAllHotels = async (req, res) => {
     try {
         // find all hotels
@@ -258,7 +314,14 @@ export const getAllHotels = async (req, res) => {
     }
 }
 
-// get all rooms
+/**
+* @name getAllRooms
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description get all rooms
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getAllRooms = async (req, res) => {
     try {
         // find all rooms
@@ -271,7 +334,14 @@ export const getAllRooms = async (req, res) => {
     }
 }
 
-// get all bookings
+/**
+* @name getAllBookings
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description get all bookings
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getAllBookings = async (req, res) => {
     try {
         // find all bookings
@@ -284,7 +354,14 @@ export const getAllBookings = async (req, res) => {
     }
 }
 
-// get booking of particular hotel owner
+/**
+* @name getHotelBookings
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description get booking of particular hotel owner
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getHotelBookings = async (req, res) => {
     try {
         // validate hotel id
@@ -310,7 +387,14 @@ export const getHotelBookings = async (req, res) => {
     }
 }
 
-// get booking of particular user
+/**
+* @name getUserBookings
+* @file adminController.js
+* @param {Request} req
+* @param {Response} res
+* @description get booking of particular user
+* @author Rutvik Malaviya (Zignuts)
+*/
 export const getUserBookings = async (req, res) => {
     try {
         // validate user id

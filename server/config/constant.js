@@ -133,6 +133,7 @@ const VALIDATION_EVENTS = {
   GET_USER_BOOKINGS: "getUserBookings",
   TOGGLE_ROOM_AVAILABILITY: "toggleRoomAvailability",
   GET_OWNER_ROOMS: "getOwnerRooms",
+  GOOGLE_SIGN_IN: "googleSignIn",
 }
 
 export default i18n;
