@@ -2,7 +2,7 @@ name: CI/CD Docker Deploy to EC2
 
 on:
   push:
-    branches: [ master ]  # change if your branch is 'main'
+    branches: [ master ]  # Change to 'main' if your default branch is 'main'
 
 jobs:
   deploy:
@@ -49,8 +49,8 @@ jobs:
         SERVICE: ${{ steps.changes.outputs.changed }}
       run: |
         ssh $EC2_USER@$EC2_HOST <<EOF
-        set -e
-        cd "${DEPLOY_DIR:-/home/ubuntu/app}" || exit 1
-        sudo docker compose build $SERVICE
-        sudo docker compose up -d $SERVICE
+          set -e
+          cd "${DEPLOY_DIR:-/home/ubuntu/app}" || exit 1
+          sudo docker compose build $SERVICE
+          sudo docker compose up -d $SERVICE
 EOF
