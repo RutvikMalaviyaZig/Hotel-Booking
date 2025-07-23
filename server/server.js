@@ -29,7 +29,7 @@ app.use(express.json());
 app.use("/api", router);
 
 app.get("/", (req, res) => {
-    res.status(200).json({ success: true, message: "Server is running" });
+    res.status(200).json({ success: true, message: "Server is running in ec2 instance" });
 });
 const PORT = process.env.PORT || 5000;
 
