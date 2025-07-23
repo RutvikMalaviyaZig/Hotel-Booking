@@ -1,0 +1,35 @@
+name: CI/CD Docker Deploy to EC2
+
+on:
+  push:
+    branches: [ master ]  # or 'main' if you're using that
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Copy Files to EC2
+      run: |
+        rsync -avz --delete ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.DEPLOY_DIR || '/home/ubuntu/app' }}
+
+    - name: Deploy on EC2 via SSH
+      env:
+        DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }}
+      run: |
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd "${DEPLOY_DIR:-/home/ubuntu/app}"
+          docker compose down
+          docker compose build --no-cache
+          docker compose up -d
+        EOF
