@@ -48,8 +48,9 @@ jobs:
         DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }}
         SERVICE: ${{ steps.changes.outputs.changed }}
       run: |
-        ssh $EC2_USER@$EC2_HOST << 'EOF'
-          cd "${DEPLOY_DIR:-***}"
-          sudo docker compose build $SERVICE
-          sudo docker compose up -d $SERVICE
-          EOF
+        ssh $EC2_USER@$EC2_HOST <<EOF
+        set -e
+        cd "${DEPLOY_DIR:-/home/ubuntu/app}" || exit 1
+        sudo docker compose build $SERVICE
+        sudo docker compose up -d $SERVICE
+EOF
