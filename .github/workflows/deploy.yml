@@ -37,8 +37,6 @@ jobs:
         changed="none"
         if git diff --name-only HEAD^ HEAD | grep '^server/'; then
           changed="server"
-        elif git diff --name-only HEAD^ HEAD | grep '^client/'; then
-          changed="client"
         fi
         echo "changed=$changed" >> $GITHUB_OUTPUT
 
