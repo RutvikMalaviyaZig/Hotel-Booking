@@ -29,10 +29,10 @@ app.use(express.json());
 app.use("/api", router);
 
 app.get("/", (req, res) => {
-    res.send({ success: true, message: "Server is running" });
+    res.status(200).json({ success: true, message: "Server is running" });
 });
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });
