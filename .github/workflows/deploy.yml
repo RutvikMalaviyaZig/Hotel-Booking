@@ -21,7 +21,8 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
-        context: .
+        context: ./server          # IMPORTANT: Point to server folder
+        file: ./server/Dockerfile  # IMPORTANT: Specify Dockerfile path
         push: true
         tags: rutvikmalaviya0322/hotel-booking-server:latest
         
