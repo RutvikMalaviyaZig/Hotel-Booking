@@ -52,4 +52,4 @@ jobs:
           cd "${DEPLOY_DIR:-***}"
           sudo docker compose build $SERVICE
           sudo docker compose up -d $SERVICE
-          EOF
+        EOF
