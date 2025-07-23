@@ -24,11 +24,12 @@ jobs:
         rsync -avz --delete ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.DEPLOY_DIR || '/home/ubuntu/app' }}
 
     - name: Deploy on EC2 via SSH
+      env:
+        DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }}
       run: |
         ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          cd ${{ secrets.DEPLOY_DIR || '/home/ubuntu/app' }}
+          cd "${DEPLOY_DIR:-/home/ubuntu/app}"
           docker compose down
           docker compose build --no-cache
           docker compose up -d
-
         EOF
