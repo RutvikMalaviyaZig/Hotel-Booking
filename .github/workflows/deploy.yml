@@ -22,7 +22,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./server          # IMPORTANT: Point to server folder
-        file: ./server/Dockerfile  # IMPORTANT: Specify Dockerfile path
+        file: ./Dockerfile  # IMPORTANT: Specify Dockerfile path
         push: true
         tags: rutvikmalaviya0322/hotel-booking-server:latest
         
