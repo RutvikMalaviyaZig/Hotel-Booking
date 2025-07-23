@@ -13,14 +13,14 @@ RUN npm install
 #Enable cron
 ENV ENABLE_CRON=true
 
+# Environment variables
+ENV NODE_ENV=development
+
 # Copy application code
 COPY . .
 
 # Expose the port the app runs on
 EXPOSE 5000
-
-# Environment variables
-ENV NODE_ENV=development
 
 # Start the application
 CMD ["node", "server.js"]
